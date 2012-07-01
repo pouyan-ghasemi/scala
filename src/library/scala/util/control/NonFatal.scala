@@ -28,7 +28,7 @@ object NonFatal {
   def unapply(t: Throwable): Option[Throwable] = t match {
     case e: StackOverflowError ⇒ Some(e) // StackOverflowError ok even though it is a VirtualMachineError
     // VirtualMachineError includes OutOfMemoryError and other fatal errors
-    case _: VirtualMachineError | _: ThreadDeath | _: InterruptedException | _: LinkageError ⇒ None
+    case _: VirtualMachineError | _: ThreadDeath | _: InterruptedException | _: LinkageError | _: ControlThrowable | _: NotImplementedError => None
     case e ⇒ Some(e)
   }
 
