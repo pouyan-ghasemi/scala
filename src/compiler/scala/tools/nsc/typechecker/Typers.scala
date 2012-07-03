@@ -4686,7 +4686,10 @@ trait Typers extends Modes with Adaptations with Tags {
             )
             val (tree2, pre2) = makeAccessible(tree1, defSym, pre, qual)
             // assert(pre.typeArgs isEmpty) // no need to add #2416-style check here, right?
-            stabilize(tree2, pre2, mode, pt)
+            val tree3 = stabilize(tree2, pre2, mode, pt)
+            // SI-5967 Important to replace param type A* with Seq[A] when seen from from a reference, to avoid
+            //         inference errors in pattern matching.
+            tree3 setType dropRepeatedParamType(tree3.tpe)
           }
         }
       }
@@ -4865,9 +4868,10 @@ trait Typers extends Modes with Adaptations with Tags {
 
           for (cdef <- catches1 if cdef.guard.isEmpty) {
             def warn(name: Name) = context.warning(cdef.pat.pos, s"This catches all Throwables. If this is really intended, use `case ${name.decoded} : Throwable` to clear this warning.")
+            def unbound(t: Tree) = t.symbol == null || t.symbol == NoSymbol
             cdef.pat match {
-              case Bind(name, Ident(_)) => warn(name)
-              case Ident(name)          => warn(name)
+              case Bind(name, i@Ident(_)) if unbound(i) => warn(name)
+              case i@Ident(name) if unbound(i)          => warn(name)
               case _ =>
             }
           }
