@@ -138,7 +138,7 @@ trait FutureCallbacks extends TestBase {
   testOnSuccessWhenFailed()
   testOnFailure()
   testOnFailureWhenSpecialThrowable(5, new Error)
-  testOnFailureWhenSpecialThrowable(6, new scala.util.control.ControlThrowable { })
+  // testOnFailureWhenSpecialThrowable(6, new scala.util.control.ControlThrowable { })
   //TODO: this test is currently problematic, because NonFatal does not match InterruptedException
   //testOnFailureWhenSpecialThrowable(7, new InterruptedException)
   testOnFailureWhenTimeoutException()
