@@ -56,6 +56,7 @@ import scala.util.control.NonFatal
  *
  * `Try` comes to the Scala standard library after years of use as an integral part of Twitter's stack.
  *
+ * @author based on Marius Eriksen's original implementation in com.twitter.util.
  * @since 2.10
  */
 sealed abstract class Try[+T] {
@@ -152,20 +153,6 @@ sealed abstract class Try[+T] {
 
 object Try {
 
-  implicit def try2either[T](tr: Try[T]): Either[Throwable, T] = {
-    tr match {
-      case Success(v) => Right(v)
-      case Failure(t) => Left(t)
-    }
-  }
-
-  implicit def either2try[T](ei: Either[Throwable, T]): Try[T] = {
-    ei match {
-      case Right(v) => Success(v)
-      case Left(t) => Failure(t)
-    }
-  }
-
   def apply[T](r: => T): Try[T] = {
     try { Success(r) } catch {
       case NonFatal(e) => Failure(e)
@@ -208,7 +195,7 @@ final case class Success[+T](value: T) extends Try[T] {
   def flatMap[U](f: T => Try[U]): Try[U] =
     try f(value)
     catch {
-      case e => Failure(e)
+      case NonFatal(e) => Failure(e)
     }
   def flatten[U](implicit ev: T <:< Try[U]): Try[U] = value
   def foreach[U](f: T => U): Unit = f(value)
