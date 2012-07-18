@@ -14,6 +14,7 @@ import scala.concurrent.util.Duration
 import scala.concurrent.{Awaitable, ExecutionContext, CanAwait}
 import scala.collection.mutable.Stack
 import scala.util.control.NonFatal
+import scala.util.{Try, Success, Failure}
 
 
 private[concurrent] trait Future[+T] extends scala.concurrent.Future[T] with Awaitable[T] {
@@ -52,7 +53,7 @@ private[concurrent] object Future {
 
     override def run() = {
       promise complete {
-        try Right(body) catch { case NonFatal(e) => Left(e) }
+        try Success(body) catch { case NonFatal(e) => Failure(e) }
       }
     }
   }

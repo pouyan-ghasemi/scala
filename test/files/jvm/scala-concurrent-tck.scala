@@ -591,6 +591,7 @@ trait FutureCombinators extends TestBase {
 
 trait FutureProjections extends TestBase {
   import ExecutionContext.Implicits._
+  import scala.util.{ Success => Right, Failure => Left }
 
   def testFailedFailureOnComplete(): Unit = once {
     done =>
@@ -871,6 +872,7 @@ trait Exceptions extends TestBase {
 
 trait CustomExecutionContext extends TestBase {
   import scala.concurrent.{ ExecutionContext, Awaitable }
+  import scala.util.{ Failure => Left, Success => Right }
 
   def defaultEC = ExecutionContext.global
 
