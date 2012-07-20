@@ -6,6 +6,7 @@ import scala.concurrent.util.duration._
 import scala.concurrent.util.Duration.Inf
 import scala.collection._
 import scala.runtime.NonLocalReturnControl
+import scala.util.{Try,Success,Failure}
 
 
 
@@ -197,7 +198,7 @@ object FutureTests extends MinimalScalaTest {
         } andThen {
           case _ => q.add(2)
         } andThen {
-          case Right(0) => q.add(Int.MaxValue)
+          case Success(0) => q.add(Int.MaxValue)
         } andThen {
           case _ => q.add(3);
         }
@@ -472,7 +473,7 @@ object FutureTests extends MinimalScalaTest {
       p1.future.isCompleted mustBe (false)
       f4.isCompleted mustBe (false)
       
-      p1 complete Right("Hello")
+      p1 complete Success("Hello")
       
       Await.ready(latch(7), TestLatch.DefaultTimeout)
       

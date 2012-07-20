@@ -591,7 +591,7 @@ trait FutureCombinators extends TestBase {
 
 trait FutureProjections extends TestBase {
   import ExecutionContext.Implicits._
-  import scala.util.{ Success => Right, Failure => Left }
+  // import scala.util.{ Success => Right, Failure => Left }
 
   def testFailedFailureOnComplete(): Unit = once {
     done =>
@@ -600,10 +600,10 @@ trait FutureProjections extends TestBase {
       throw cause
     }
     f.failed onComplete {
-      case Right(t) =>
+      case Success(t) =>
         assert(t == cause)
         done()
-      case Left(t) =>
+      case Failure(t) =>
         assert(false)
     }
   }
@@ -625,9 +625,9 @@ trait FutureProjections extends TestBase {
     done =>
     val f = future { 0 }
     f.failed onComplete {
-      case Right(t) =>
+      case Success(t) =>
         assert(false)
-      case Left(t) =>
+      case Failure(t) =>
         assert(t.isInstanceOf[NoSuchElementException])
         done()
     }
@@ -795,84 +795,9 @@ trait Exceptions extends TestBase {
 
 }
 
-// trait TryEitherExtractor extends TestBase {
-
-//   import scala.util.{Try, Success, Failure}
-
-//   def testSuccessMatch(): Unit = once {
-//     done =>
-//     val thisIsASuccess = Success(42)
-//     thisIsASuccess match {
-//       case Success(v) =>
-//         done()
-//         assert(v == 42)
-//       case Failure(e) =>
-//         done()
-//         assert(false)
-//       case other =>
-//         done()
-//         assert(false)
-//     }
-//   }
-
-//   def testRightMatch(): Unit = once {
-//     done =>
-//     val thisIsNotASuccess: Right[Throwable, Int] = Right(43)
-//     thisIsNotASuccess match {
-//       case Success(v) =>
-//         done()
-//         assert(v == 43)
-//       case Failure(e) =>
-//         done()
-//         assert(false)
-//       case other =>
-//         done()
-//         assert(false)
-//     }
-//   }
-
-//   def testFailureMatch(): Unit = once {
-//     done =>
-//     val thisIsAFailure = Failure(new Exception("I'm an exception"))
-//     thisIsAFailure match {
-//       case Success(v) =>
-//         done()
-//         assert(false)
-//       case Failure(e) =>
-//         done()
-//         assert(e.getMessage == "I'm an exception")
-//       case other =>
-//         done()
-//         assert(false)
-//     }
-//   }
-
-//   def testLeftMatch(): Unit = once {
-//     done =>
-//     val thisIsNotAFailure: Left[Throwable, Int] = Left(new Exception("I'm an exception"))
-//     thisIsNotAFailure match {
-//       case Success(v) =>
-//         done()
-//         assert(false)
-//       case Failure(e) =>
-//         done()
-//         assert(e.getMessage == "I'm an exception")
-//       case other =>
-//         done()
-//         assert(false)
-//     }
-    
-//   }
-
-//   testSuccessMatch()
-//   testRightMatch()
-//   testFailureMatch()
-//   testLeftMatch()
-// }
-
 trait CustomExecutionContext extends TestBase {
   import scala.concurrent.{ ExecutionContext, Awaitable }
-  import scala.util.{ Failure => Left, Success => Right }
+  // import scala.util.{ Failure => Left, Success => Right }
 
   def defaultEC = ExecutionContext.global
 
@@ -968,13 +893,13 @@ trait CustomExecutionContext extends TestBase {
            } flatMap { x =>
              Promise.successful(x + 1).future.map(addOne).map(addOne)
            } onComplete {
-            case Left(t) =>
+            case Failure(t) =>
               try {
                 throw new AssertionError("error in test: " + t.getMessage, t)
               } finally {
                 done()
               }
-            case Right(x) =>
+            case Success(x) =>
               assertEC()
               assert(x == 14)
               done()
@@ -1002,12 +927,8 @@ with FutureProjections
 with Promises
 with BlockContexts
 with Exceptions
-// with TryEitherExtractor
 with CustomExecutionContext
 {
   System.exit(0)
 }
-
-
-
 
