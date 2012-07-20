@@ -591,4 +591,17 @@ object Either {
    */
   def cond[A, B](test: Boolean, right: => B, left: => A): Either[A, B] =
     if (test) Right(right) else Left(left)
+
+  object TryConversions {
+    implicit def try2either[T](tr: Try[T]): Either[Throwable, T] = tr match {
+      case Success(v) => Right(v)
+      case Failure(t) => Left(t)
+    }
+    
+    implicit def either2try[T](ei: Either[Throwable, T]): Try[T] = ei match {
+      case Right(v) => Success(v)
+      case Left(t) => Failure(t)
+    }
+  }
+
 }
