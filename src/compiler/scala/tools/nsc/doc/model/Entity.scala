@@ -288,7 +288,7 @@ trait DocTemplateEntity extends MemberTemplateEntity {
 
   /** All templates that are members of this template. If this template is a package, only templates for which
     * documentation is available  in the universe (`DocTemplateEntity`) are listed. */
-  def templates: List[TemplateEntity with MemberEntity]
+  def templates: List[MemberTemplateEntity]
 
   /** All methods that are members of this template. */
   def methods: List[Def]

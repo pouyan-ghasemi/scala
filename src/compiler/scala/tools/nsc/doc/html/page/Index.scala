@@ -93,16 +93,22 @@ class Index(universe: doc.Universe, val index: doc.Index) extends HtmlPage {
                     firstLink ++ createLink(template, includePlaceholder = false, includeText = true)
 
                   case _ => // FIXME: this default case should not be necessary. For some reason AnyRef is not a package, object, trait, or class
-                    val entry = entities.head
-                    placeholderSeq ++ createLink(entry, includePlaceholder = false, includeText = true)
+                    placeholderSeq ++ createLink(entities.head, includePlaceholder = false, includeText = true)
                 }
 
+                // val entity = entities.head
+                // val len = entities.length
+
                 <li title={ entities.head.qualifiedName }>{ itemContents }</li>
+                val unrolled = nestedTypeMembers(typeMembers(entities.head).toList)
+                // val typeMembers = entity.abstractTypes ++ entity.aliasTypes ++ entity.templates.filter(x => x.isTrait || x.isClass)  sorted (implicitly[Ordering[MemberEntity]])
+                println("[unrolled entities...!] " + entities)
               }
             }</ol>
             <ol class="packages"> {
-              for (sp <- pack.packages sortBy (_.name.toLowerCase)) yield
+              for (sp <- pack.packages sortBy (_.name.toLowerCase)) yield {
                 <li class="pack" title={ sp.qualifiedName }>{ packageElem(sp) }</li>
+              }
             }</ol>
           </xml:group>
         }
@@ -114,4 +120,16 @@ class Index(universe: doc.Universe, val index: doc.Index) extends HtmlPage {
     if (ety.inTemplate.isPackage) ety.name
     else (packageQualifiedName(ety.inTemplate) + "." + ety.name)
 
+  def recursiveTemplates(e: Entity): List[DocTemplateEntity] = e match {
+    case dtpl: DocTemplateEntity => dtpl :: (dtpl.templates map recursiveTemplates flatten)
+    case _ => Nil
+  }
+
+  def nestedTypeMembers(ets: List[MemberTemplateEntity]): List[MemberTemplateEntity] = ets match {
+      case Nil => ets
+      case x :: xs => x :: nestedTypeMembers(xs)
+  }
+
+  def typeMembers(ety: DocTemplateEntity): List[MemberTemplateEntity] = 
+    ety.abstractTypes ++ ety.aliasTypes ++ ety.templates.filter(x => x.isTrait || x.isClass)  sorted (implicitly[Ordering[MemberEntity]])
 }
