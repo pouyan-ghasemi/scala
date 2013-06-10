@@ -1,0 +1,4 @@
+spore-test-neg2.scala:11: error: Incorrect usage of `spore`: function literal expected
+    f
+    ^
+one error found

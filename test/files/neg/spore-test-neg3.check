@@ -1,0 +1,4 @@
+spore-test-neg3.scala:11: error: invalid reference to value v3
+    val v3 = "bad"
+        ^
+one error found

@@ -1,0 +1,4 @@
+spore-test-neg1.scala:9: error: Only val defs allowed at this position
+    println("hi")
+           ^
+one error found
